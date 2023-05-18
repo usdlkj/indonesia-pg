@@ -109,16 +109,8 @@ exports.vaCreate = (req, res) => {
       paymentGateway: 'xendit',
       paymentMethod: 'va',
     })
-    .then(order => {
-      XenditPayment.create({
-        orderId: order.id,
-        paymentChannel: 'va',
-        responseType: 'vaCreated',
-        responseData: va,
-      })
-      .then(() => {
-        res.redirect('/orders');
-      })
+    .then(() => {
+      res.redirect('/orders');
     })
   })
   .catch(err => {

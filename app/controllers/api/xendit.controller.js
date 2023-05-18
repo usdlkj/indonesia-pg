@@ -8,6 +8,38 @@ const Order = db.Order;
 const XenditPayment = db.XenditPayment;
 const Op = db.Sequelize.Op;
 
+exports.vaCreated = (req, res) => {
+
+  // Verify the callback token
+  if (req.headers['x-callback-token'] == process.env.XENDIT_CALLBACK_TOKEN) {
+
+    // If triggered, find one order by its invoice number
+    Order.findAll({where: {invoiceNumber: {[Op.eq]: req.body.external_id}}})
+    .then(data => {
+      if (data.length == 0) {
+        console.log('Invoice not found');
+      } else {
+        order = data[0];
+      }
+
+      // Store the callback's data
+      XenditPayment.create({
+        orderId: order.id,
+        paymentChannel: 'va',
+        responseType: 'vaCreated',
+        responseData: req.body,
+      })
+    });
+
+    res.status(200).send();
+  } else {
+    
+    // Wrong callback token
+    console.log('Wrong callback token');
+    res.status(500).send();
+  }
+}
+
 exports.vaPayment = (req, res) => {
   const vaSpecificOptions = {};
   const va = new VirtualAcc(vaSpecificOptions);
