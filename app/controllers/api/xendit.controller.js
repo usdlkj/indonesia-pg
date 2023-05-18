@@ -33,7 +33,7 @@ exports.vaCreated = (req, res) => {
 
     res.status(200).send();
   } else {
-    
+
     // Wrong callback token
     console.log('Wrong callback token');
     res.status(500).send();
@@ -157,6 +157,8 @@ exports.qrPayment = (req, res) => {
 }
 
 exports.roPayment = (req, res) => {
+  let payment = req.body.data;
+  
   // Verify the callback token
   if (req.headers['x-callback-token'] == process.env.XENDIT_CALLBACK_TOKEN) {
 
