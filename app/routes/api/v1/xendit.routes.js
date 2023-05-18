@@ -3,6 +3,8 @@ module.exports = app => {
   var router = require('express').Router();
 
   router.post('/vaPayment', xendit.vaPayment);
+  router.post('/qrPayment', xendit.qrPayment);
+  router.post('/roPayment', xendit.roPayment);
 
   app.use('/api/v1/xendit', router);
 };
