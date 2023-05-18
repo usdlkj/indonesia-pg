@@ -157,13 +157,11 @@ exports.qrPayment = (req, res) => {
 }
 
 exports.roPayment = (req, res) => {
-  let payment = req.body.data;
-  
   // Verify the callback token
   if (req.headers['x-callback-token'] == process.env.XENDIT_CALLBACK_TOKEN) {
 
     // If triggered, find one order by its invoice number
-    Order.findAll({where: {invoiceNumber: {[Op.eq]: payment.external_id}}})
+    Order.findAll({where: {invoiceNumber: {[Op.eq]: req.body.external_id}}})
     .then(data => {
       if (data.length == 0) {
         console.log('Invoice not found');
