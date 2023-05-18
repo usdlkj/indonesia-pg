@@ -1,0 +1,33 @@
+extends ../layouts/default.pug 
+
+block content
+  .row
+    .col
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item.active Order
+        .card-body
+          table.table.table-sm.table-hover
+            thead
+              tr
+                th Invoice Number
+                th Payer
+                th Phone
+                th Amount
+                th PG
+                th Payment Method
+                th Status
+            tbody
+              each order in orders
+                tr
+                  td= order.invoiceNumber
+                  td= order.payerName
+                  td= order.payerPhone
+                  td= order.amount
+                  td= order.paymentGateway
+                  td= order.paymentMethod
+                  td= order.paymentStatus

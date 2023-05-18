@@ -1,0 +1,189 @@
+extends ../layouts/default.pug 
+
+block content
+  .row
+    .col.col-md-8
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/companies') Companies
+              li.breadcrumb-item.active= company.companyName
+        .card-body
+          form(action=`/companies/${company.id}` method='POST')
+            .row
+              .col
+                .mb-3
+                  label.form-label Company
+                    span.text-danger *
+                  input.form-control(type='text' value=company.companyName name='companyName' required)
+              .col
+                .mb-3
+                  label.form-label Brand
+                  input.form-control(type='text' value=company.brandName name='brandName')
+            .row
+              .col
+                .mb-3
+                  label.form-label Address
+                    span.text-danger *
+                  input.form-control(type='text' value=company.address name='address' required)
+              .col
+                .mb-3
+                  label.form-label City
+                    span.text-danger *
+                  input.form-control(type='text' value=company.city name='city' required)
+            .row
+              .col
+                .mb-3
+                  label.form-label Country
+                    span.text-danger *
+                  input.form-control(type='text' value=company.country name='country' required)
+              .col
+                .mb-3
+                  label.form-label Phone Number
+                    span.text-danger *
+                  input.form-control(type='text' value=company.phoneNumber name='phoneNumber' required)
+            .row
+              .col
+                .mb-3
+                  label.form-label Fax
+                  input.form-control(type='text' value=company.fax name='fax')
+              .col
+                .mb-3
+                  label.form-label Website
+                  input.form-control(type='text' value=company.website name='website')
+            .row
+              .col
+                .mb-3
+                  label.form-label Email
+                    span.text-danger *
+                  input.form-control(type='text' value=company.email name='email' required)
+              .col
+                .mb-3
+                  label.form-label Tax Id Number
+                  input.form-control(type='text' value=company.taxIdNumber name='taxIdNumber')
+            .row
+              .col
+                .mb-3
+                  label.form-check-label VAT Enabled
+                    span.text-danger *
+                  select.form-select(name='vatEnabled' required)
+                    each val in [[0, 'No'], [1, 'Yes']]
+                      if (company.vatEnabled == val[0])
+                        option(selected value=val[0])= val[1]
+                      else
+                        option(value=val[0])= val[1]
+              .col
+                .mb-3
+                  label.form-check-label Is Closing
+                    span.text-danger *
+                  select.form-select(name='isClosing' required)
+                    each val in [[0, 'No'], [1, 'Yes']]
+                      if (company.isClosing == val[0])
+                        option(selected value=val[0])= val[1]
+                      else
+                        option(value=val[0])= val[1]
+            .row
+              .col
+                .mb-3
+                  label.form-label Type
+                    span.text-danger *
+                  select.form-select(name='type' required)
+                    each val in [[0, 'UMKM'], [1, 'Corporation']]
+                      if (company.type == val[0])
+                        option(selected value=val[0])= val[1]
+                      else
+                        option(value=val[0])= val[1]
+              .col
+                .mb-3
+                  label.form-label Status
+                    span.text-danger *
+                  select.form-select(name='status' required)
+                    each val in [[0, 'New'], [1, 'Active'], [2, 'Non-active']]
+                      if (company.status == val[0])
+                        option(selected value=val[0])= val[1]
+                      else
+                        option(value=val[0])= val[1]
+            .row
+              .col
+                .mb-3
+                  label.form-label Client
+                  input.form-control(type='text' value=company.clientId name='clientId')
+              .col
+                .mb-3
+                  label.form-label Currency
+                  select.form-select(name='currencyId')
+                    each currency in currencies
+                      if currency == company.currencyId
+                        option(selected value=currency.id)= currency.currencyName
+                      else
+                        option(value=currency.id)= currency.currencyName
+            .row
+              .col
+                .mb-3
+                  label.form-label Pic
+                  select.form-select(name='picId')
+                    each user in users
+                      if (company.picId == user.id)
+                        option(selected value=user.id)= user.name
+                      else
+                        option(value=user.id)= user.name
+              .col
+            .row
+              .col.text-center
+                button.btn.btn-primary.block.w-25(type='submit') Save
+
+    .col.col-md-4
+      .card.mb-4
+        .card-header Record Data
+        .card-body
+          .row 
+            .col Created by
+            .col= company.createdBy
+          .row 
+            .col Created at
+            .col= company.createdAt
+          .row 
+            .col Updated by
+            .col= company.updatedBy
+          .row
+            .col Updated at
+            .col= company.updatedAt
+          .row 
+            .col Deleted by
+            .col= company.deletedBy
+          .row
+            .col Deleted at
+            .col= company.deletedAt
+      .card.mb-4
+        .card-header Actions
+        .card-body
+          if company.deletedAt == null
+            form(action=`/companies/${company.id}/delete` method='POST')
+              button.btn.btn-danger(type='submit') Delete
+          else
+            form(action=`/companies/${company.id}/restore` method='POST')
+              button.btn.btn-warning(type='submit') Restore
+      .card
+        .card-header Links
+        .card-body
+          ul
+            li
+              a(href=`/companies/${company.id}/users`) Users
+            li
+              a(href=`/companies/${company.id}/accounts`) Accounts
+            li
+              a(href=`/companies/${company.id}/partners`) Partners
+            li
+              a(href=`/companies/${company.id}/productCategories`) Product Categories
+            li
+              a(href=`/companies/${company.id}/products`) Products
+            li
+              a(href=`/companies/${company.id}/transactions`) Transactions
+            li
+              a(href=`/companies/${company.id}/invoices`) Invoices
+
+        

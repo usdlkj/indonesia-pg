@@ -1,0 +1,35 @@
+extends ../../layouts/default.pug 
+
+block content
+  .row
+    .col.col-md-6
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/xendit') Xendit
+              li.breadcrumb-item.active Create QR
+        .card-body
+          form(action='/xendit/qr/create' id='payment-form' method='POST')
+            .row.mb-3
+              .col
+                label.form-label(for='payerName') Payer Name
+                input.form-control(name='payerName' id='payerName' value='Ivan Tanu')
+            .row.mb-3
+              .col
+                label.form-label(for='payerPhone') Payer Phone
+                input.form-control(name='payerPhone' id='payerPhone' value='081211223344')
+            .row.mb-3
+              .col
+                label.form-label(for='invoiceAmount') Invoice Value
+                input.form-control(name='invoiceAmount' id='invoiceAmount' value='10000')
+            .row.mb-3 
+              .col
+                label.form-label(for='invoiceNumber') Invoice Number
+                input.form-control(name='invoiceNumber' id='invoiceNumber')
+            .row
+              .col
+                button.btn.btn-primary.submit(type='submit') Submit

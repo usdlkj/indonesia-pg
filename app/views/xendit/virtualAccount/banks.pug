@@ -1,0 +1,33 @@
+extends ../../layouts/default.pug 
+
+block content
+  .row
+    .col.col-md-8
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/xendit') Xendit
+              li.breadcrumb-item.active Banks
+        .card-body
+          table.table.table-sm.table-hover
+            thead
+              tr
+                th Bank Name
+                th Bank Code
+                th Ctr Code
+                th Cur Code
+                th Active?
+            tbody
+              each bank in banks
+                tr
+                  td= bank.name
+                  td= bank.code
+                  td= bank.country
+                  td= bank.currency
+                  td= bank.is_activated
+              
+

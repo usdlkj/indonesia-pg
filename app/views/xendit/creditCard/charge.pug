@@ -1,0 +1,108 @@
+extends ../../layouts/default.pug 
+
+block scripts
+  script(src='https://js.xendit.co/v1/xendit.min.js')
+  script(type='text/javascript').
+    Xendit.setPublishableKey('#{xenditKey}');
+
+    var $form = $('#payment-form');
+    $(".submit").on("click", function() {  
+      $form.submit(function(event) {
+        // Disable the submit button to prevent repeated clicks:
+        $form.find('.submit').prop('disabled', true);
+        // Request a token from Xendit:
+        Xendit.card.createToken({
+          amount: $form.find('#invoiceAmount').val(),
+          card_number: $form.find('#card-number').val(),
+          card_exp_month: $form.find('#card-exp-month').val(),
+          card_exp_year: $form.find('#card-exp-year').val(),
+          card_cvn: $form.find('#card-cvn').val(),
+          is_multiple_use: false,
+          should_authenticate: true
+        }, xenditResponseHandler);
+        // Prevent the form from being submitted:
+        return false;
+      });
+    });
+
+    function xenditResponseHandler (err, creditCardToken) {
+      console.log(creditCardToken);
+      if (err) {
+        // Show the errors on the form
+        $('#error pre').text(err.message);
+        $('#error').show();
+        $form.find('.submit').prop('disabled', false); // Re-enable submission
+
+        return;
+      }
+
+      if (creditCardToken.status === 'VERIFIED') {
+        // Get the token ID:
+        var token = creditCardToken.id;
+
+        // Insert the token into the form so it gets submitted to the server:
+        $form.append($('<input type="hidden" name="xenditToken" />').val(token));
+
+        // Submit the form to your server:
+        $form.get(0).submit();
+      } else if (creditCardToken.status === 'IN_REVIEW') {
+        window.open(creditCardToken.payer_authentication_url, 'sample-inline-frame');
+        $('#three-ds-container').show();
+      } else if (creditCardToken.status === 'FAILED') {
+        $('#error pre').text(creditCardToken.failure_reason);
+        $('#error').show();
+        $form.find('.submit').prop('disabled', false); // Re-enable submission
+      }
+    }
+
+block content
+  .row
+    .col.col-md-6
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/xendit') Xendit
+              li.breadcrumb-item.active Create Charge
+        .card-body
+          form(action='/xendit/cc/charge' id='payment-form' method='POST')
+            .row.mb-3
+              .col
+                label.form-label(for='card-number') Card Number
+                input.form-control(name='card-number' id='card-number' value='5200000000001096')
+            .row.mb-3
+              .col
+                label.form-label(for='card-exp-month') Exp Month 
+                input.form-control(name='card-exp-month' id='card-exp-month' value='12')
+              .col
+                label.form-label(for='card-exp-year') Exp Year 
+                input.form-control(name='card-exp-year' id='card-exp-year' value='2040')
+              .col
+                label.form-label(for='card-cvn') CVN
+                input.form-control(name='card-cvn' id='card-cvn' value='123')
+            .row.mb-3
+              .col
+                label.form-label(for='payerName') Payer Name
+                input.form-control(name='payerName' id='payerName' value='Ivan Tanu')
+              .col
+                label.form-label(for='payerPhone') Payer Phone
+                input.form-control(name='payerPhone' id='payerPhone' value='081211223344')
+            .row.mb-3
+              .col
+                label.form-label(for='invoiceAmount') Invoice Value
+                input.form-control(name='invoiceAmount' id='invoiceAmount' value='10000')
+              .col
+                label.form-label(for='invoiceNumber') Invoice Number
+                input.form-control(name='invoiceNumber' id='invoiceNumber')
+            .row
+              .col
+                button.btn.btn-primary.submit(type='submit') Submit
+
+  .d-none(id='error')
+    p Whoops! There was an error while processing your request.
+
+  div(id='three-ds-container' style='display: none;')
+    iframe(height='450' width='550' id='sample-inline-frame' name='sample-inline-frame')

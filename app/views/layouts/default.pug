@@ -1,0 +1,19 @@
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    link(rel='stylesheet' href='/bootstrap/css/bootstrap.min.css')
+    title #{title}
+    script(src='https://code.jquery.com/jquery-3.7.0.min.js')
+  body
+    .container
+      nav.navbar.navbar-expand-lg
+        .container-fluid
+          ul.navbar-nav
+            li.nav-item
+              a.nav-link(href='/orders') Orders
+            li.nav-item
+              a.nav-link(href='/xendit') Xendit
+      block content
+    script(src='/bootstrap/js/bootstrap.bundle.min.js')
+    block scripts

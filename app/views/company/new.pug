@@ -1,0 +1,118 @@
+extends ../layouts/default.pug 
+
+block content
+  .row
+    .col.col-md-8
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/companies') Companies
+              li.breadcrumb-item.active New
+        .card-body
+          form(action='/companies' method='POST')
+            .row
+              .col
+                .mb-3
+                  label.form-label Company
+                    span.text-danger *
+                  input.form-control(type='text' name='companyName' required)
+              .col
+                .mb-3
+                  label.form-label Brand
+                  input.form-control(type='text' name='brandName')
+            .row
+              .col
+                .mb-3
+                  label.form-label Address
+                    span.text-danger *
+                  input.form-control(type='text' name='address' required)
+              .col
+                .mb-3
+                  label.form-label City
+                    span.text-danger *
+                  input.form-control(type='text' name='city' required)
+            .row
+              .col
+                .mb-3
+                  label.form-label Country
+                    span.text-danger *
+                  input.form-control(type='text' name='country' required)
+              .col
+                .mb-3
+                  label.form-label Phone Number
+                    span.text-danger *
+                  input.form-control(type='text' name='phoneNumber' required)
+            .row
+              .col
+                .mb-3
+                  label.form-label Fax
+                  input.form-control(type='text' name='fax')
+              .col
+                .mb-3
+                  label.form-label Website
+                  input.form-control(type='text' name='website')
+            .row
+              .col
+                .mb-3
+                  label.form-label Email
+                    span.text-danger *
+                  input.form-control(type='text' name='email' required)
+              .col
+                .mb-3
+                  label.form-label Tax Id Number
+                  input.form-control(type='text' name='taxIdNumber')
+            .row
+              .col
+                .mb-3
+                  label.form-check-label VAT Enabled
+                    span.text-danger *
+                  select.form-select(name='vatEnabled' required)
+                    each val in [[0, 'No'], [1, 'Yes']]
+                      option(value=val[0])= val[1]
+              .col
+                .mb-3
+                  label.form-check-label Is Closing
+                    span.text-danger *
+                  select.form-select(name='isClosing' required)
+                    each val in [[0, 'No'], [1, 'Yes']]
+                      option(value=val[0])= val[1]
+            .row
+              .col
+                .mb-3
+                  label.form-label Type
+                    span.text-danger *
+                  select.form-select(name='type' required)
+                    each val in [[0, 'UMKM'], [1, 'Corporation']]
+                      option(value=val[0])= val[1]
+              .col
+                .mb-3
+                  label.form-label Status
+                    span.text-danger *
+                  select.form-select(name='status' required)
+                    each val in [[0, 'New'], [1, 'Active'], [2, 'Non-active']]
+                      option(value=val[0])= val[1]
+            .row
+              .col
+                .mb-3
+                  label.form-label Client
+                  input.form-control(type='text' name='clientId' disabled)
+              .col
+                .mb-3
+                  label.form-label Currency
+                  select.form-select(name='currencyId')
+                    each currency in currencies
+                      option(value=currency.id)= currency.currencyName
+            .row
+              .col
+                .mb-3
+                  label.form-label Pic
+                  select.form-select(name='picId' disabled)
+              .col
+            .row
+              button.btn.btn-primary(type='submit') Save
+
+    .col.col-md-4
