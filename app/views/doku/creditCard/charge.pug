@@ -1,0 +1,103 @@
+extends ../../layouts/default.pug 
+
+block scripts
+  script(src="https://unpkg.com/axios@1.1.2/dist/axios.min.js")
+  script(type='text/javascript').
+    var $form = $('#payment-form');
+    var $payerName = $('#payerName')[0];
+    var $payerPhone = $('#payerPhone')[0];
+    var $invoiceNumber = $('#invoiceNumber')[0];
+    var $amount = $('#invoiceAmount')[0];
+    var $inlineFrame = $('#doku-inline-frame')[0];
+    $(".submit").on("click", function() {  
+      $form.submit(function(event) {
+        // Disable the submit button to prevent repeated clicks:
+        $form.find('.submit').prop('disabled', true);
+        // Set the iframe url
+        // Generate Digest from JSON Body, For HTTP Method GET/DELETE don't need generate Digest
+        let data = '{\"order\":{\"invoice_number\":\"'+$invoiceNumber.value+'\",\"amount\":'+$amount.value+
+          ',\"callback_url\":\"#{serverUrl}/orders\",},\"customer\":{\"name\":\"'+$payerName.value+
+          '\",\"phone\":\"'+$payerPhone.value+'\",},}';
+        console.log(data);
+        axios.post('#{serverUrl}/api/v1/doku/getDigest', {
+          data: data,
+          clientId: '#{clientId}',
+          requestId: '#{requestId}',
+          requestTimestamp: '#{requestTimestamp}',
+        })
+        .then(getDigest => {
+          // Generate Header Signature
+          console.log(getDigest.data);
+          axios.post('#{serverUrl}/api/v1/doku/getSignature', {
+            digest: getDigest.data.digest,
+            clientId: '#{clientId}',
+            requestId: '#{requestId}',
+            requestTimestamp: '#{requestTimestamp}',
+            requestTarget: '#{dokuEndpoint}',
+          })
+          .then(getSignature => {
+            console.log(getSignature.data);
+            let payload = {
+              order: {
+                amount: $amount.value,
+                invoice_number: $invoiceNumber.value,
+                callback_url: "#{serverUrl}/orders",
+              },
+              customer: {
+                name: $payerName.value,
+                phone: $payerPhone.value,
+              }
+            };
+            let headers = {
+              'Client-Id': '#{clientId}',
+              'Request-Id': '#{requestId}',
+              'Request-Timestamp': '#{requestTimestamp}',
+              Signature: 'HMACSHA256='+getSignature.data.signature,
+            };
+            axios.post('#{dokuEndpoint}', payload, {headers: headers})
+            .then(res => {
+              $inlineFrame.src = res.data.credit_card_payment_page.url;
+            })
+            .catch(err => {
+              console.log("Error: " + err.message);
+            })
+          });
+          // Prevent the form from being submitted:
+        });
+        return false;
+      });
+    });
+
+block content
+  .row
+    .col.col-md-6
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/doku') Doku
+              li.breadcrumb-item.active Create Charge
+        .card-body
+          form(action='/doku/cc/charge' id='payment-form' method='POST')
+            .row.mb-3
+              .col
+                label.form-label(for='payerName') Payer Name
+                input.form-control(name='payerName' id='payerName' value='Ivan Tanu')
+              .col
+                label.form-label(for='payerPhone') Payer Phone
+                input.form-control(name='payerPhone' id='payerPhone' value='081211223344')
+            .row.mb-3
+              .col
+                label.form-label(for='invoiceAmount') Invoice Amount
+                input.form-control(name='invoiceAmount' id='invoiceAmount' value='10000')
+              .col
+                label.form-label(for='invoiceNumber') Invoice Number
+                input.form-control(name='invoiceNumber' id='invoiceNumber')
+            .row
+              .col
+                button.btn.btn-primary.submit(type='submit') Submit
+    .col.col-md-6
+      iframe(id='doku-inline-frame' name='doku-inline-frame' width="500" height="300")

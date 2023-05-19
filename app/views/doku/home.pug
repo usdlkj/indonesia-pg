@@ -1,0 +1,30 @@
+extends ../layouts/default.pug
+
+block content
+  .card
+    .card-header
+      nav(aria-label='breadcrumb')
+        ol.breadcrumb
+          li.breadcrumb-item
+            a(href='/') Home
+          li.breadcrumb-item.active Doku
+    .card-body
+      ul
+        li Credit Card
+          ul
+            li
+              a(href='/doku/cc/charge') Create Charge
+        li Virtual Account
+          ul
+            li
+              a(href='/doku/va/banks') Banks
+            li
+              a(href='/doku/va/create') Create VA
+        li QR
+          ul
+            li
+              a(href='/doku/qr/create') Create QR
+        li Retail Store
+          ul
+            li
+              a(href='/doku/rt/create') Create Retail
