@@ -24,21 +24,37 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 // use helmet and limiter
-// app.use(helmet({
-//   contentSecurityPolicy: {
-//     directives: {
-//       "script-src": ["'self'", "js.xendit.co"],
-//     },
-//   },
-//   crossOriginResourcePolicy: false,
-// }));
-// app.use(limiter);
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      "script-src": [
+        "'self'", 
+        (req, res) => "'nonce-eafaeb79e67d68285f2f3f6024270b02'", 
+        "xendit.co",
+        "*.xendit.co",
+      ],
+      "connect-src": [
+        "'self'",
+        "xendit.co",
+        "*.xendit.co",
+        "doku.com",
+        "*.doku.com",
+      ],
+      "frame-src": [
+        "xendit.co",
+        "*.xendit.co",
+        "doku.com",
+        "*.doku.com",
+      ]
+    }
+  }
+}));
+app.use(limiter);
 
-// use bootstrap
-app.use(
-  "/bootstrap",
-  express.static(__dirname + "/node_modules/bootstrap/dist")
-);
+// set static folders
+app.use("/bootstrap", express.static(__dirname + "/node_modules/bootstrap/dist"));
+app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
+app.use("/axios", express.static(__dirname + "/node_modules/axios/dist"));
 
 app.set("views", path.join(__dirname, "app/views"));
 app.set("view engine", "pug");
