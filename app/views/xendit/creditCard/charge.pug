@@ -2,7 +2,7 @@ extends ../../layouts/default.pug
 
 block scripts
   script(src='https://js.xendit.co/v1/xendit.min.js')
-  script(type='text/javascript').
+  script(type='text/javascript' nonce='eafaeb79e67d68285f2f3f6024270b02').
     Xendit.setPublishableKey('#{xenditKey}');
 
     var $form = $('#payment-form');
@@ -26,7 +26,6 @@ block scripts
     });
 
     function xenditResponseHandler (err, creditCardToken) {
-      console.log(creditCardToken);
       if (err) {
         // Show the errors on the form
         $('#error pre').text(err.message);
