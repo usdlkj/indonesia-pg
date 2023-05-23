@@ -3,6 +3,7 @@ module.exports = app => {
   var router = require('express').Router();
 
   router.get('/', xendit.landing);
+  router.get('/:id', xendit.responses);
 
   router.get('/cc/charge', xendit.ccNew);
   router.post('/cc/charge', xendit.ccCharge);
@@ -15,8 +16,9 @@ module.exports = app => {
   router.get('/qr/create', xendit.qrNew);
   router.post('/qr/create', xendit.qrCreate);
 
-  router.get('/rt/create', xendit.rtNew);
-  router.post('/rt/create', xendit.rtCreate);
+  router.get('/ro/create', xendit.roNew);
+  router.post('/ro/create', xendit.roCreate);
+  router.post('/ro/:id/pay', xendit.roPay);
 
   app.use('/xendit', router);
 };

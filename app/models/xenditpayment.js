@@ -1,6 +1,7 @@
 'use strict';
 const {v4:uuidv4} = require('uuid');
 const {Model} = require('sequelize');
+const moment = require('moment');
 module.exports = (sequelize, DataTypes) => {
   class XenditPayment extends Model {
     /**
@@ -34,6 +35,16 @@ module.exports = (sequelize, DataTypes) => {
     responseData: {
       type: DataTypes.JSON,
       allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      get() {
+        const rawValue = this.getDataValue("createdAt");
+        return rawValue
+          ? moment(rawValue).format("DD/MM/yyyy hh:mm:ss")
+          : null;
+      },
     }
   }, {
     sequelize,

@@ -13,6 +13,22 @@ exports.landing = (req, res) => {
   res.render('xendit/home');
 }
 
+exports.responses = async (req, res) => {
+  try {
+    let order = await Order.findByPk(req.params.id, {
+      include: [
+        {model: XenditPayment, as: 'payments'},
+      ]
+    })
+    res.render('xendit/responses', {
+      order: order,
+    })
+  } catch (err) {
+    req.session.message = err.message;
+    res.redirect('/orders');
+  }
+}
+
 exports.ccNew = (req, res) => {
   res.render('xendit/creditCard/charge', {
     xenditKey: process.env.XENDIT_PUBLIC_KEY,
@@ -68,6 +84,8 @@ exports.ccCharge = async (req, res) => {
     });
   }
 }
+
+
 
 exports.vaBanks = async (req, res) => {
   const vaSpecificOptions = {};
@@ -214,11 +232,11 @@ exports.qrCreate = async (req, res) => {
   }
 }
 
-exports.rtNew = (req, res) => {
+exports.roNew = (req, res) => {
   res.render('xendit/retail/create');
 }
 
-exports.rtCreate = async (req, res) => {
+exports.roCreate = async (req, res) => {
   const retailOutletSpecificOptions = {};
   const ro = new RetailOutlet(retailOutletSpecificOptions);
 
@@ -254,6 +272,47 @@ exports.rtCreate = async (req, res) => {
 
     req.session.message = 'RO created';
     res.redirect('/orders');
+  } catch (err) {
+    req.session.message = err.message;
+    res.redirect('/orders');
+  }
+}
+
+exports.roPay = async (req, res) => {
+  try {
+    let order = await Order.findByPk(req.params.id);
+    let payments = await XenditPayment.findAll({
+      where: {
+        orderId: {[Op.eq]: order.id},
+        paymentChannel: 'ro',
+        responseType: 'roCreated',
+      }
+    });
+    if (payments.length != 1) {
+      throw new Error('RO creation data not found')
+    } else {
+      let data = JSON.parse(payments[0].responseData);
+      let payment = await axios.post('https://api.xendit.co/fixed_payment_code/simulate_payment', {
+        transfer_amount: parseFloat(data.expected_amount),
+        retail_outlet_name: data.retail_outlet_name,
+        payment_code: data.payment_code,
+      }, {
+        headers: {
+          'Authorization': `Basic ${btoa(process.env.XENDIT_KEY + ':')}`,
+        }
+      });
+
+      payment = JSON.parse(payment);
+      if (payment.status == 'COMPLETED') {
+        order.paymentStatus = 'paid';
+        await order.save();
+      } else {
+        throw new Error(payment.message);
+      }
+      
+      req.session.message = payment.message;
+      res.redirect('/orders');
+    }
   } catch (err) {
     req.session.message = err.message;
     res.redirect('/orders');

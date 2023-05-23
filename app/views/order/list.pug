@@ -25,7 +25,11 @@ block content
             tbody
               each order in orders
                 tr
-                  td= order.invoiceNumber
+                  if order.paymentGateway == 'xendit'
+                    td
+                      a(href=`/xendit/${order.id}`)= order.invoiceNumber
+                  else
+                    td= order.invoiceNumber
                   td= order.payerName
                   td= order.payerPhone
                   td= order.amount
@@ -35,4 +39,7 @@ block content
                   td
                     if (order.paymentGateway == 'xendit' && order.paymentMethod == 'va' && order.paymentStatus == 'outstanding')
                       form(action=`/xendit/va/${order.id}/pay` method='POST')
+                        button.btn.btn-danger.btn-sm(type='submit') Pay
+                    if (order.paymentGateway == 'xendit' && order.paymentMethod == 'ro' && order.paymentStatus == 'outstanding')
+                      form(action=`/xendit/ro/${order.id}/pay` method='POST')
                         button.btn.btn-danger.btn-sm(type='submit') Pay

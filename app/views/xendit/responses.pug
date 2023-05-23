@@ -1,0 +1,30 @@
+extends ../layouts/default.pug 
+
+block content
+  .row
+    .col
+      .card
+        .card-header
+          nav(aria-label='breadcrumb')
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href='/') Home
+              li.breadcrumb-item
+                a(href='/orders') Order
+              li.breadcrumb-item= order.invoiceNumber
+        .card-body
+          table.table.table-sm.table-hover
+            thead
+              tr
+                th Payment Channel
+                th Respone Type
+                th(style='width: 500px') Response Data 
+                th Created At
+            tbody
+              each payment in order.payments
+                tr
+                  td= payment.paymentChannel
+                  td= payment.responseType
+                  td
+                    span.d-inline-block.text-wrap(style='width: 500px')= payment.responseData
+                  td= payment.createdAt
