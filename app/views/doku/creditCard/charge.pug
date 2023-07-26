@@ -14,46 +14,40 @@ block scripts
         $form.find('.submit').prop('disabled', true);
         // Set the iframe url
         // Generate Digest from JSON Body, For HTTP Method GET/DELETE don't need generate Digest
-        let data = '{\"order\":{\"invoice_number\":\"'+$invoiceNumber.value+'\",\"amount\":'+$amount.value+
-          ',\"callback_url\":\"#{serverUrl}/orders\",},\"customer\":{\"name\":\"'+$payerName.value+
-          '\",\"phone\":\"'+$payerPhone.value+'\",},}';
-        console.log(data);
+        let data = {
+          order: {
+            amount: $amount.value,
+            invoice_number: $invoiceNumber.value,
+            callback_url: "#{serverUrl}/orders",
+          },
+          customer: {
+            name: $payerName.value,
+            phone: $payerPhone.value,
+          }
+        };
         axios.post('#{serverUrl}/api/v1/doku/getDigest', {
-          data: data,
+          data: JSON.stringify(data),
           clientId: '#{clientId}',
           requestId: '#{requestId}',
           requestTimestamp: '#{requestTimestamp}',
         })
         .then(getDigest => {
           // Generate Header Signature
-          console.log(getDigest.data);
           axios.post('#{serverUrl}/api/v1/doku/getSignature', {
             digest: getDigest.data.digest,
             clientId: '#{clientId}',
             requestId: '#{requestId}',
             requestTimestamp: '#{requestTimestamp}',
-            requestTarget: '#{dokuEndpoint}',
+            requestTarget: '/credit-card/v1/payment-page',
           })
           .then(getSignature => {
-            console.log(getSignature.data);
-            let payload = {
-              order: {
-                amount: $amount.value,
-                invoice_number: $invoiceNumber.value,
-                callback_url: "#{serverUrl}/orders",
-              },
-              customer: {
-                name: $payerName.value,
-                phone: $payerPhone.value,
-              }
-            };
             let headers = {
               'Client-Id': '#{clientId}',
               'Request-Id': '#{requestId}',
               'Request-Timestamp': '#{requestTimestamp}',
               Signature: 'HMACSHA256='+getSignature.data.signature,
             };
-            axios.post('#{dokuEndpoint}', payload, {headers: headers})
+            axios.post('#{dokuEndpoint}', data, {headers: headers})
             .then(res => {
               $inlineFrame.src = res.data.credit_card_payment_page.url;
             })
