@@ -206,8 +206,6 @@ exports.vaCancel = async (req, res) => {
     
     var responseData = JSON.parse(vaCreated.responseData);
     var yesterday = moment().subtract(1, 'days').utc().format();
-    console.log(responseData.id);
-    console.log(yesterday);
 
     const res = await axios.patch(`https://api.xendit.co/callback_virtual_accounts/${responseData.id}`, {
       expiration_date: yesterday

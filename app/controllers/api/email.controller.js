@@ -7,13 +7,13 @@ const transporter = nodemailer.createTransport({
   // secure: false,
   // auth: {
   //   // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-  //   user: "AKIAUPHKNPLEBW53BNKZ",
-  //   pass: "BGzE+sN/+DxLOh3AYfuK+OXE/kn18BUtv8A0Ma0VXUOK",
+  //   user: "",
+  //   pass: "",
   // },
   // tls: {
   //   ciphers:'SSLv3'
   // }
-  host: "mail.kcic.co.id",
+  host: "",
   port: 465,
   secure: true,
   auth: {
