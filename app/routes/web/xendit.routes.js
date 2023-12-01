@@ -11,6 +11,7 @@ module.exports = app => {
   router.get('/va/banks', xendit.vaBanks);
   router.get('/va/create', xendit.vaNew);
   router.post('/va/create', xendit.vaCreate);
+  router.post('/va/:id/cancel', xendit.vaCancel);
   router.post('/va/:id/pay', xendit.vaPay);
 
   router.get('/qr/create', xendit.qrNew);

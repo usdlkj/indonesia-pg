@@ -8,6 +8,8 @@ const Op = db.Sequelize.Op;
 const Order = db.Order;
 const XenditPayment = db.XenditPayment;
 const axios = require('axios');
+const { response } = require('express');
+const moment = require('moment');
 
 exports.landing = (req, res) => {
   res.render('xendit/home');
@@ -188,6 +190,43 @@ exports.vaPay = async (req, res) => {
     res.redirect('/orders');
   }
 }
+
+
+exports.vaCancel = async (req, res) => {
+  try {
+    // If triggered, find one order by its invoice number
+    var order = await Order.findByPk(req.params.id);
+
+    var vaCreated = await XenditPayment.findOne({
+      where: {
+        orderId: order.id,
+        responseType: 'vaCreated'
+      }
+    });
+    
+    var responseData = JSON.parse(vaCreated.responseData);
+    var yesterday = moment().subtract(1, 'days').utc().format();
+    console.log(responseData.id);
+    console.log(yesterday);
+
+    const res = await axios.patch(`https://api.xendit.co/callback_virtual_accounts/${responseData.id}`, {
+      expiration_date: yesterday
+    }, {
+      headers: {
+        'Authorization': `Basic ${btoa(process.env.XENDIT_KEY + ':')}`,
+      }
+    });
+    console.log(res);
+
+    order.paymentStatus = 'cancelled';
+    await order.save();
+
+    res.redirect('/orders');
+  } catch (err) {
+    console.log(err.message);
+    res.redirect('/orders');
+  }
+};
 
 exports.qrNew = (req, res) => {
   res.render('xendit/qr/create');

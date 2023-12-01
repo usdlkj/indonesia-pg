@@ -43,3 +43,6 @@ block content
                     if (order.paymentGateway == 'xendit' && order.paymentMethod == 'ro' && order.paymentStatus == 'outstanding')
                       form(action=`/xendit/ro/${order.id}/pay` method='POST')
                         button.btn.btn-danger.btn-sm(type='submit') Pay
+                    if (order.paymentGateway == 'xendit' && order.paymentMethod == 'va' && order.paymentStatus == 'outstanding')
+                      form(action=`/xendit/va/${order.id}/cancel` method='POST')
+                        button.btn.btn-danger.btn-sm(type='submit') Cancel
